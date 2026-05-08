@@ -1,7 +1,3 @@
-# data
-books.csv
-*.csv
-
 # python
 __pycache__/
 *.py[cod]

@@ -1,0 +1,7 @@
+services:
+  search-engine:
+    build: .
+    container_name: goodreads-search-engine
+    ports:
+      - "7860:7860"
+    restart: unless-stopped
