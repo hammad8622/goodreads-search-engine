@@ -10,11 +10,11 @@ The whole thing runs in Docker, so a single command brings up the web UI on `htt
 
 | # | Name | Roll No |
 |---|------|---------|
-| 1 | Muhammad Umar | 19094-MU216 |
-| 2 | _add name_ | _roll_ |
-| 3 | _add name_ | _roll_ |
-| 4 | _add name_ | _roll_ |
-| 5 | _add name_ | _roll_ |
+| 1 | Muhammad Hammad Ihsan | F23607006 |
+| 2 | Mohsin Pervaiz | F23607009 |
+| 3 | Osama Zubair | F23607026 |
+| 4 | Sohail Aslam | F23607054 |
+| 5 | Sameer Rizwan | F23607050 |
 
 ---
 
