@@ -1,0 +1,22 @@
+# data
+books.csv
+*.csv
+
+# python
+__pycache__/
+*.py[cod]
+*.egg-info/
+.venv/
+venv/
+
+# jupyter
+.ipynb_checkpoints/
+
+# os / editor
+.DS_Store
+.vscode/
+.idea/
+
+# gradio
+flagged/
+gradio_cached_examples/
