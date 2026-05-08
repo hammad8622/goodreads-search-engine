@@ -1,12 +1,12 @@
 # Goodreads Book Search Engine
 
-A small search engine over the Goodreads-Books dataset built for our NLP course (Assignment 3). It compares four classical information-retrieval methods side by side so you can see how each one ran[...]
+A small search engine over the Goodreads-Books dataset built for our NLP course (Assignment 3). It compares four classical information-retrieval methods side by side so you can see how each one ranks the same query differently.
 
 The whole thing runs in Docker, so a single command brings up the web UI on `http://localhost:7860`.
 
 ---
 
-## Team
+## Group Members
 
 | # | Name | Roll No |
 |---|------|---------|
@@ -54,7 +54,7 @@ The assignment required TF-IDF plus three more. We picked methods from genuinely
 
 ## Dataset
 
-[Goodreads-Books on Kaggle](https://www.kaggle.com/datasets/jealousleopard/goodreadsbooks). The CSV is committed as `books.csv`. We load the first 5000 rows and build the searchable field as `titl[...]
+[Goodreads-Books on Kaggle](https://www.kaggle.com/datasets/jealousleopard/goodreadsbooks). The CSV is committed as `books.csv`. We load the first 5000 rows and build the searchable field as `title + " by " + authors`, so a query can match either the book name or the author.
 
 ---
 
