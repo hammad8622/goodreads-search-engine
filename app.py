@@ -61,5 +61,4 @@ ui = gr.Interface(
     description="enter a query to find books using 4 different nlp algorithms."
 )
 
-if __name__ == "__main__":
-    ui.launch(server_name="0.0.0.0", server_port=7860)
+ui.launch(server_name="0.0.0.0", server_port=7860)

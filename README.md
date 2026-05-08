@@ -1,26 +1,24 @@
-# nlp assignment 3 — book search engine
+# Goodreads Book Search Engine
 
-a working search engine over the **goodreads-books** dataset, comparing 4 classical nlp ranking methods side by side. fully dockerized — one command to run.
+A small search engine over the Goodreads-Books dataset built for our NLP course (Assignment 3). It compares four classical information-retrieval methods side by side so you can see how each one ranks the same query differently.
 
-> course: natural language processing &nbsp;·&nbsp; assignment: 3 &nbsp;·&nbsp; team size: 5
+The whole thing runs in Docker, so a single command brings up the web UI on `http://localhost:7860`.
 
 ---
 
-## team members
+## Team
 
-| # | name | roll no |
+| # | Name | Roll No |
 |---|------|---------|
-| 1 | Muhammad Hammad Ihsan | F23607006 |
-| 2 | Mohsin Pervaiz | F23607009 |
-| 3 | Osama Zubair | F23607026 |
-| 4 | Sameer Rizwan | F23607050 |
-| 5 | Sohail Aslam | F23607054 |
+| 1 | Muhammad Umar | 19094-MU216 |
+| 2 | _add name_ | _roll_ |
+| 3 | _add name_ | _roll_ |
+| 4 | _add name_ | _roll_ |
+| 5 | _add name_ | _roll_ |
 
 ---
 
-## quick start (docker)
-
-the assignment requires the project to run with no setup. so:
+## Running it
 
 ```bash
 git clone https://github.com/19094-MU216-MUHAMMADUMAR/goodreads-search-engine.git
@@ -28,56 +26,63 @@ cd goodreads-search-engine
 docker compose up
 ```
 
-then open **http://localhost:7860** in your browser. that's it.
+Then open **http://localhost:7860**.
 
-to stop: `Ctrl+C`, then `docker compose down`.
+To stop it: `Ctrl+C`, then `docker compose down`.
+
+If you'd rather run it without Docker:
+
+```bash
+pip install -r requirements.txt
+python app.py
+```
 
 ---
 
-## the 4 algorithms
+## The four algorithms
 
-assignment required tf-idf + 3 more. we picked 3 that come from genuinely different retrieval families so the comparison is meaningful:
+The assignment required TF-IDF plus three more. We picked methods from genuinely different retrieval families so the comparison would actually show something:
 
-| # | method | family | similarity |
+| # | Method | Family | Similarity |
 |---|--------|--------|------------|
-| 1 | **tf-idf** | weighted vector space | cosine |
-| 2 | **bag of words** | frequency vector space | cosine |
-| 3 | **binary / probabilistic** | boolean | cosine |
-| 4 | **jaccard** | set-based | intersection / union |
+| 1 | TF-IDF | weighted vector space | cosine |
+| 2 | Bag of Words | frequency vector space | cosine |
+| 3 | Binary / Probabilistic | boolean vector space | cosine |
+| 4 | Jaccard | set-based | intersection / union |
 
 ---
 
-## dataset
+## Dataset
 
-[goodreads-books on kaggle](https://www.kaggle.com/datasets/jealousleopard/goodreadsbooks). already in the repo as `books.csv`. we use the first 5000 rows, and the search field is `title + " by " + authors`.
+[Goodreads-Books on Kaggle](https://www.kaggle.com/datasets/jealousleopard/goodreadsbooks). The CSV is committed as `books.csv`. We load the first 5000 rows and build the searchable field as `title + " by " + authors`, so a query can match either the book name or the author.
 
 ---
 
-## data flow algorithm
+## Data flow algorithm
 
-step-by-step of what happens to a query end to end:
+Step-by-step of what happens to a query from the moment it's typed until results appear:
 
 ```
 INPUT : raw user query Q
 OUTPUT: top-5 books with similarity scores from all 4 algorithms
 
-1. load books.csv (head 5000), build docs = title + " by " + authors
-2. fit 3 vectorizers ONCE at startup: tf-idf, bow, binary
-3. on query: lowercase Q, transform into all 3 vector spaces
-4. compute similarities:
-     - cosine for tf-idf, bow, binary
-     - jaccard (set-based) for the 4th
-5. argsort tf-idf scores desc, take top 5
-6. format output with all 4 scores per book, return to gradio
+1. Load books.csv (head 5000) and build docs = title + " by " + authors
+2. Fit 3 vectorizers ONCE at startup: TF-IDF, BoW, Binary
+3. On each query, lowercase Q and transform it into all 3 vector spaces
+4. Compute similarities:
+     - cosine for TF-IDF, BoW, Binary
+     - Jaccard (set-based) for the 4th
+5. Argsort the TF-IDF scores descending and take the top 5
+6. Format the output (each book + all 4 scores) and return to Gradio
 ```
 
 ```mermaid
 flowchart TD
     A[books.csv] --> B[pandas head 5000]
     B --> C[docs = title + by + authors]
-    C --> E1[tf-idf fit]
-    C --> E2[bow fit]
-    C --> E3[binary fit]
+    C --> E1[TF-IDF fit]
+    C --> E2[BoW fit]
+    C --> E3[Binary fit]
 
     U[user query] --> Q[lowercase]
     Q --> T1[transform tfidf]
@@ -85,29 +90,29 @@ flowchart TD
     Q --> T3[transform binary]
     Q --> T4[token set]
 
-    E1 & T1 --> S1[cosine tfidf]
-    E2 & T2 --> S2[cosine bow]
-    E3 & T3 --> S3[cosine binary]
-    C & T4 --> S4[jaccard]
+    E1 & T1 --> S1[cosine TF-IDF]
+    E2 & T2 --> S2[cosine BoW]
+    E3 & T3 --> S3[cosine Binary]
+    C & T4 --> S4[Jaccard]
 
-    S1 & S2 & S3 & S4 --> R[rank top 5 by tf-idf]
-    R --> O[gradio output]
+    S1 & S2 & S3 & S4 --> R[rank top 5 by TF-IDF]
+    R --> O[Gradio output]
 ```
 
 ---
 
-## architecture algorithm
+## Architecture algorithm
 
-system-level view — what runs once vs per query:
+A system-level view: which components exist, what runs once, and what runs on every query.
 
 ```
-LAYER 1  data layer        books.csv -> pandas -> docs list
-LAYER 2  indexing  (once)  tf-idf / bow / binary indexes
-LAYER 3  query processing  lowercase + tokenize + transform
-LAYER 4  scoring           cosine x3 + jaccard
-LAYER 5  ranking           argsort tf-idf, top-k = 5
-LAYER 6  presentation      gradio textbox in / textbox out
-LAYER 7  deployment        docker + docker compose, port 7860
+Layer 1  Data           books.csv -> pandas -> docs list
+Layer 2  Indexing (1x)  TF-IDF / BoW / Binary indexes
+Layer 3  Query proc.    lowercase + tokenize + transform
+Layer 4  Scoring        cosine x3 + Jaccard
+Layer 5  Ranking        argsort TF-IDF, top-k = 5
+Layer 6  Presentation   Gradio textbox in / textbox out
+Layer 7  Deployment     Docker + Compose, port 7860
 ```
 
 ```mermaid
@@ -116,13 +121,13 @@ flowchart LR
         A1[(books.csv)] --> A2[data layer]
         A2 --> A3[corpus docs]
         A3 --> A4[indexing layer]
-        A4 --> Ia[tf-idf idx]
-        A4 --> Ib[bow idx]
-        A4 --> Ic[binary idx]
+        A4 --> Ia[TF-IDF idx]
+        A4 --> Ib[BoW idx]
+        A4 --> Ic[Binary idx]
     end
 
     subgraph ONLINE [runs per query]
-        B1[gradio ui] --> B2[query processing]
+        B1[Gradio UI] --> B2[query processing]
         B2 --> B3[scoring layer]
         B3 --> B4[ranking top-5]
         B4 --> B1
@@ -136,31 +141,31 @@ flowchart LR
     end
 ```
 
-### per-query sequence
+### Per-query sequence
 
 ```mermaid
 sequenceDiagram
-    participant U as user
-    participant G as gradio
+    participant U as User
+    participant G as Gradio
     participant F as search_engine()
-    participant S as scoring
+    participant S as Scoring
     U->>G: types query
     G->>F: search_engine(query)
-    F->>S: 3x cosine + jaccard
+    F->>S: 3x cosine + Jaccard
     S-->>F: 4 score arrays
-    F->>F: argsort tfidf, top 5
+    F->>F: argsort TF-IDF, top 5
     F-->>G: formatted results
     G-->>U: top 5 + 4 scores each
 ```
 
 ---
 
-## file structure
+## Repo layout
 
 ```
 goodreads-search-engine/
-├── app.py                  # main app (run by docker)
-├── NLP_Assignment_3.ipynb  # original colab notebook
+├── app.py                  # main app entry point
+├── NLP_Assignment_3.ipynb  # original Colab notebook
 ├── books.csv               # dataset
 ├── requirements.txt
 ├── Dockerfile
@@ -172,38 +177,34 @@ goodreads-search-engine/
 
 ---
 
-## sample queries
+## Sample queries to try
 
-- `harry potter` — tf-idf and bow agree, jaccard slightly lower because of the "by author" tokens
-- `tolkien` — author-only query, all 4 still surface lord of the rings
-- `the hobbit` — short title, binary and jaccard end up almost identical
-- `dan brown` — nice example of tf-idf down-weighting the common token "brown"
-
----
-
-## observations
-
-- **tf-idf** gave the most intuitive ranking overall — idf kills off common words like "the".
-- **bow** tracks tf-idf closely on short queries but degrades when stopwords slip in.
-- **binary** is surprisingly close to bow because book titles are short, so term frequency barely matters.
-- **jaccard** is the strictest — it punishes the query for not matching the *whole* doc, so shorter titles get boosted.
+- `harry potter` — TF-IDF and BoW agree closely; Jaccard drops a bit because of the "by author" tokens.
+- `tolkien` — author-only query; all four still surface The Lord of the Rings.
+- `the hobbit` — short title, so Binary and Jaccard end up nearly identical.
+- `dan brown` — a good example of TF-IDF down-weighting the common token "brown".
 
 ---
 
-## limitations / future work
+## What we observed
 
-- only 5000 rows loaded for demo speed (sparse matrices would scale fine to the full set)
-- no stemming/lemmatization — `book` and `books` are different tokens
-- no spell correction
-- ranking is driven by tf-idf only; a fairer demo would let the user pick the ranker
-- bm25 would be a natural 5th algorithm to add
-
----
-
-## tech
-
-python 3.11 · pandas · numpy · scikit-learn · gradio 3.50.2 · docker · docker compose
+- **TF-IDF** gave the most intuitive ranking overall, mostly because IDF kills off common words like "the".
+- **BoW** tracks TF-IDF closely on short queries but starts losing quality whenever a stopword slips in.
+- **Binary** is surprisingly close to BoW here because book titles are short — term frequency barely matters in a 4-word title.
+- **Jaccard** is the strictest. It penalises the query for not matching the *whole* document, so shorter titles get an unfair boost.
 
 ---
 
-*nlp course — assignment 3*
+## Limitations
+
+- Only 5000 rows are loaded for demo speed (the sparse representation would scale to the full set fine).
+- No stemming or lemmatization — `book` and `books` are treated as different tokens.
+- No spelling correction.
+- The final ordering is driven by TF-IDF only; a fairer demo would let the user pick the ranker.
+- BM25 would be an obvious 5th algorithm to add later.
+
+---
+
+## Tech
+
+Python 3.11 · pandas · NumPy · scikit-learn · Gradio 3.50.2 · Docker · Docker Compose
