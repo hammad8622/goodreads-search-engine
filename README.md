@@ -10,11 +10,11 @@ a working search engine over the **goodreads-books** dataset, comparing 4 classi
 
 | # | name | roll no |
 |---|------|---------|
-| 1 | muhammad umar | 19094-MU216 |
-| 2 | _add name_ | _roll_ |
-| 3 | _add name_ | _roll_ |
-| 4 | _add name_ | _roll_ |
-| 5 | _add name_ | _roll_ |
+| 1 | Muhammad Hammad Ihsan | F23607006 |
+| 2 | Mohsin Pervaiz | F23607009 |
+| 3 | Osama Zubair | F23607026 |
+| 4 | Sameer Rizwan | F23607050 |
+| 5 | Sohail Aslam | F23607054 |
 
 ---
 
